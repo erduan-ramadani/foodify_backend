@@ -1,5 +1,6 @@
 package com.eddiapps.foodify.controller;
 
+import com.eddiapps.foodify.dto.CreateUserRequest;
 import com.eddiapps.foodify.entity.UserEntity;
 import com.eddiapps.foodify.service.UserService;
 
@@ -7,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/users")
@@ -19,7 +22,7 @@ public class UserController {
     }
 
     @PostMapping
-    public UserEntity createUser(@RequestBody UserEntity user) {
+    public UserEntity createUser(@Valid @RequestBody CreateUserRequest user) {
         return userService.createUser(user);
     }
 }

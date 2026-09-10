@@ -1,5 +1,6 @@
 package com.eddiapps.foodify.service;
 
+import com.eddiapps.foodify.dto.CreateUserRequest;
 import com.eddiapps.foodify.entity.UserEntity;
 import com.eddiapps.foodify.repository.UserRepository;
 
@@ -14,7 +15,10 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public UserEntity createUser(UserEntity user) {
+    public UserEntity createUser(CreateUserRequest request) {
+        UserEntity user = new UserEntity();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
         return userRepository.save(user);
     }
 }
