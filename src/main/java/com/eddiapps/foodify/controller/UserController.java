@@ -4,10 +4,7 @@ import com.eddiapps.foodify.dto.CreateUserRequest;
 import com.eddiapps.foodify.dto.UserResponse;
 import com.eddiapps.foodify.service.UserService;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
@@ -24,5 +21,10 @@ public class UserController {
     @PostMapping
     public UserResponse createUser(@Valid @RequestBody CreateUserRequest user) {
         return userService.createUser(user);
+    }
+
+    @GetMapping("/{id}")
+    public UserResponse getUserById(@PathVariable Long id) {
+        return userService.getUserById(id);
     }
 }
