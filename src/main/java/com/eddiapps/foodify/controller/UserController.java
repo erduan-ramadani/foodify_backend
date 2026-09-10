@@ -48,4 +48,5 @@ public class UserController {
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
     }
+
 }

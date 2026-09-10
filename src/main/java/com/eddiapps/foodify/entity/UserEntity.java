@@ -1,5 +1,7 @@
 package com.eddiapps.foodify.entity;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -13,6 +15,8 @@ public class UserEntity {
     private String email;
 
     private String name;
+    @OneToMany(mappedBy = "user")
+    private List<FoodEntryEntity> foodEntries;
 
     public Long getId() {
         return id;
