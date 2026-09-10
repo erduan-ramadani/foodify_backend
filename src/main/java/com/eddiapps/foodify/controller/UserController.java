@@ -1,7 +1,7 @@
 package com.eddiapps.foodify.controller;
 
 import com.eddiapps.foodify.dto.CreateUserRequest;
-import com.eddiapps.foodify.entity.UserEntity;
+import com.eddiapps.foodify.dto.UserResponse;
 import com.eddiapps.foodify.service.UserService;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +22,7 @@ public class UserController {
     }
 
     @PostMapping
-    public UserEntity createUser(@Valid @RequestBody CreateUserRequest user) {
+    public UserResponse createUser(@Valid @RequestBody CreateUserRequest user) {
         return userService.createUser(user);
     }
 }
