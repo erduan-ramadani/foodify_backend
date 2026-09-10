@@ -1,6 +1,7 @@
 package com.eddiapps.foodify.service;
 
 import com.eddiapps.foodify.dto.CreateUserRequest;
+import com.eddiapps.foodify.dto.UpdateUserRequest;
 import com.eddiapps.foodify.dto.UserResponse;
 import com.eddiapps.foodify.entity.UserEntity;
 import com.eddiapps.foodify.exception.EmailAlreadyExistsException;
@@ -62,6 +63,19 @@ public class UserService {
                         user.getEmail(),
                         user.getName()))
                 .toList();
+    }
+
+    public UserResponse updateUser(Long id, UpdateUserRequest request) {
+        Optional<UserEntity> user = userRepository.findById(id);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("User with id: " + id + " not found");
+        }
+        UserEntity userEntity = user.get();
+        userEntity.setName(request.getName());
+        userEntity.setEmail(request.getEmail());
+
+        UserEntity savedUser = userRepository.save(userEntity);
+        return new UserResponse(savedUser.getId(), savedUser.getEmail(), savedUser.getName());
     }
 
 }

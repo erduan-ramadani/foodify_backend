@@ -1,6 +1,7 @@
 package com.eddiapps.foodify.controller;
 
 import com.eddiapps.foodify.dto.CreateUserRequest;
+import com.eddiapps.foodify.dto.UpdateUserRequest;
 import com.eddiapps.foodify.dto.UserResponse;
 import com.eddiapps.foodify.service.UserService;
 
@@ -33,5 +34,13 @@ public class UserController {
     @GetMapping
     public List<UserResponse> getAllUsers() {
         return userService.getAllUsers();
+    }
+
+    @PutMapping("/{id}")
+    public UserResponse updateUser(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateUserRequest request
+    ) {
+        return userService.updateUser(id, request);
     }
 }
