@@ -43,7 +43,7 @@ public class UserService {
     public UserResponse getUserById(Long id) {
         Optional<UserEntity> user = userRepository.findById(id);
         if (user.isEmpty()) {
-            throw new UserNotFoundException("User mit id: " + id + " wurde nicht gefunden");
+            throw new UserNotFoundException("User with id: " + id + " not found");
         }
 
         UserEntity foundUser = user.get();
@@ -76,6 +76,14 @@ public class UserService {
 
         UserEntity savedUser = userRepository.save(userEntity);
         return new UserResponse(savedUser.getId(), savedUser.getEmail(), savedUser.getName());
+    }
+
+    public void deleteUser(Long id) {
+        Optional<UserEntity> user = userRepository.findById(id);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("User with id: " + id + " not found");
+        }
+        userRepository.deleteById(id);
     }
 
 }
