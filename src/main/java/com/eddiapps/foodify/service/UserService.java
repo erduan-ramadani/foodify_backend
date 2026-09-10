@@ -9,6 +9,7 @@ import com.eddiapps.foodify.repository.UserRepository;
 
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -50,6 +51,17 @@ public class UserService {
                 foundUser.getEmail(),
                 foundUser.getName()
         );
+    }
+
+    public List<UserResponse> getAllUsers() {
+        List<UserEntity> users = userRepository.findAll();
+        return users
+                .stream()
+                .map(user -> new UserResponse(
+                        user.getId(),
+                        user.getEmail(),
+                        user.getName()))
+                .toList();
     }
 
 }
