@@ -20,4 +20,11 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .body(ex.getMessage());
     }
+
+    @ExceptionHandler(FoodEntryNotFoundException.class)
+    ResponseEntity<String> handleFoodEntryNotFoundException(FoodEntryNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ex.getMessage());
+    }
 }
