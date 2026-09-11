@@ -30,45 +30,24 @@ public class FoodEntryService {
     }
 
     public FoodEntryResponse createFoodEntry(Long userId, CreateFoodEntryRequest request) {
-        Optional<UserEntity> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            throw new UserNotFoundException("User with id: " + userId + " does not exist");
-        }
+        UserEntity userEntity = getUserOrThrow(userId);
+
         FoodEntryEntity foodEntryEntity = new FoodEntryEntity();
         foodEntryEntity.setName(request.getName());
         foodEntryEntity.setCalories(request.getCalories());
         foodEntryEntity.setProtein(request.getProtein());
         foodEntryEntity.setCarbs(request.getCarbs());
         foodEntryEntity.setFat(request.getFat());
-        foodEntryEntity.setUser(user.get());
+        foodEntryEntity.setUser(userEntity);
 
         FoodEntryEntity savedFoodEntry = foodEntryRepository.save(foodEntryEntity);
-        return new FoodEntryResponse(
-                savedFoodEntry.getId(),
-                savedFoodEntry.getName(),
-                savedFoodEntry.getCalories(),
-                savedFoodEntry.getProtein(),
-                savedFoodEntry.getCarbs(),
-                savedFoodEntry.getFat()
-        );
+        return toFoodEntryResponse(savedFoodEntry);
     }
 
     public List<FoodEntryResponse> getFoodEntriesByUserId(Long userId) {
-        Optional<UserEntity> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            throw new UserNotFoundException("User with id: " + userId + " does not exist");
-        }
+        getUserOrThrow(userId);
         List<FoodEntryEntity> foodEntries = foodEntryRepository.findByUser_Id(userId);
-        return foodEntries.stream().map(foodEntry ->
-                new FoodEntryResponse(
-                        foodEntry.getId(),
-                        foodEntry.getName(),
-                        foodEntry.getCalories(),
-                        foodEntry.getProtein(),
-                        foodEntry.getCarbs(),
-                        foodEntry.getFat()
-                )
-        ).toList();
+        return foodEntries.stream().map(this::toFoodEntryResponse).toList();
     }
 
     public FoodEntryResponse updateFoodEntry(
@@ -76,21 +55,7 @@ public class FoodEntryService {
             Long foodEntryId,
             UpdateFoodEntryRequest request) {
 
-        Optional<UserEntity> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            throw new UserNotFoundException("User with id: " + userId + " does not exist");
-        }
-
-        Optional<FoodEntryEntity> foodEntry = foodEntryRepository.findById(foodEntryId);
-        if (foodEntry.isEmpty()) {
-            throw new FoodEntryNotFoundException("Food entry with id: " + foodEntryId + " not found");
-        }
-
-        if (!foodEntry.get().getUser().getId().equals(userId)) {
-            throw new FoodEntryNotFoundException("Food entry with id: " + foodEntryId + " not found");
-        }
-
-        FoodEntryEntity foodEntryEntity = foodEntry.get();
+        FoodEntryEntity foodEntryEntity = getFoodEntryOrThrow(userId, foodEntryId);
         foodEntryEntity.setName(request.getName());
         foodEntryEntity.setCalories(request.getCalories());
         foodEntryEntity.setProtein(request.getProtein());
@@ -98,21 +63,16 @@ public class FoodEntryService {
         foodEntryEntity.setFat(request.getFat());
 
         FoodEntryEntity savedFoodEntry = foodEntryRepository.save(foodEntryEntity);
-        return new FoodEntryResponse(
-                savedFoodEntry.getId(),
-                savedFoodEntry.getName(),
-                savedFoodEntry.getCalories(),
-                savedFoodEntry.getProtein(),
-                savedFoodEntry.getCarbs(),
-                savedFoodEntry.getFat()
-        );
+        return toFoodEntryResponse(savedFoodEntry);
     }
 
     public void deleteFoodEntry(Long userId, Long foodEntryId) {
-        Optional<UserEntity> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            throw new UserNotFoundException("User with id: " + userId + " does not exist");
-        }
+        FoodEntryEntity foodEntryEntity = getFoodEntryOrThrow(userId, foodEntryId);
+        foodEntryRepository.delete(foodEntryEntity);
+    }
+
+    private FoodEntryEntity getFoodEntryOrThrow(Long userId, Long foodEntryId) {
+        getUserOrThrow(userId);
 
         Optional<FoodEntryEntity> foodEntry = foodEntryRepository.findById(foodEntryId);
         if (foodEntry.isEmpty()) {
@@ -123,6 +83,25 @@ public class FoodEntryService {
             throw new FoodEntryNotFoundException("Food entry with id: " + foodEntryId + " not found");
         }
 
-        foodEntryRepository.deleteById(foodEntryId);
+        return foodEntry.get();
+    }
+
+    private UserEntity getUserOrThrow(Long userId) {
+        Optional<UserEntity> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("User with id: " + userId + " does not exist");
+        }
+        return user.get();
+    }
+
+    private FoodEntryResponse toFoodEntryResponse(FoodEntryEntity foodEntry) {
+        return new FoodEntryResponse(
+                foodEntry.getId(),
+                foodEntry.getName(),
+                foodEntry.getCalories(),
+                foodEntry.getProtein(),
+                foodEntry.getCarbs(),
+                foodEntry.getFat()
+        );
     }
 }
