@@ -2,6 +2,7 @@ package com.eddiapps.foodify.controller;
 
 import com.eddiapps.foodify.dto.CreateUserRequest;
 import com.eddiapps.foodify.dto.LoginRequest;
+import com.eddiapps.foodify.dto.LoginResponse;
 import com.eddiapps.foodify.dto.UserResponse;
 import com.eddiapps.foodify.service.UserService;
 
@@ -28,7 +29,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@Valid @RequestBody LoginRequest request) {
+    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
         return userService.login(request);
     }
 }

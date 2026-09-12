@@ -1,9 +1,6 @@
 package com.eddiapps.foodify.service;
 
-import com.eddiapps.foodify.dto.CreateUserRequest;
-import com.eddiapps.foodify.dto.LoginRequest;
-import com.eddiapps.foodify.dto.UpdateUserRequest;
-import com.eddiapps.foodify.dto.UserResponse;
+import com.eddiapps.foodify.dto.*;
 import com.eddiapps.foodify.entity.UserEntity;
 import com.eddiapps.foodify.exception.EmailAlreadyExistsException;
 import com.eddiapps.foodify.exception.InvalidCredentialsException;
@@ -99,7 +96,7 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public String login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
         Optional<UserEntity> user = userRepository.findByEmail(request.getEmail());
         if (user.isEmpty()) {
             throw new InvalidCredentialsException("Invalid credentials");
@@ -110,7 +107,9 @@ public class UserService {
             throw new InvalidCredentialsException("Invalid credentials");
         }
 
-        return jwtService.generateToken(userEntity);
+        return new LoginResponse(
+                jwtService.generateToken(userEntity), "Bearer"
+        );
     }
 
 }
