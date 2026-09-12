@@ -1,10 +1,12 @@
 package com.eddiapps.foodify.service;
 
 import com.eddiapps.foodify.dto.CreateUserRequest;
+import com.eddiapps.foodify.dto.LoginRequest;
 import com.eddiapps.foodify.dto.UpdateUserRequest;
 import com.eddiapps.foodify.dto.UserResponse;
 import com.eddiapps.foodify.entity.UserEntity;
 import com.eddiapps.foodify.exception.EmailAlreadyExistsException;
+import com.eddiapps.foodify.exception.InvalidCredentialsException;
 import com.eddiapps.foodify.exception.UserNotFoundException;
 import com.eddiapps.foodify.repository.UserRepository;
 
@@ -20,9 +22,15 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    private final JwtService jwtService;
+
+    public UserService(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public UserResponse createUser(CreateUserRequest request) {
@@ -89,6 +97,20 @@ public class UserService {
             throw new UserNotFoundException("User with id: " + id + " not found");
         }
         userRepository.deleteById(id);
+    }
+
+    public String login(LoginRequest request) {
+        Optional<UserEntity> user = userRepository.findByEmail(request.getEmail());
+        if (user.isEmpty()) {
+            throw new InvalidCredentialsException("Invalid credentials");
+        }
+
+        UserEntity userEntity = user.get();
+        if (!passwordEncoder.matches(request.getPassword(), userEntity.getPasswordHash())) {
+            throw new InvalidCredentialsException("Invalid credentials");
+        }
+
+        return jwtService.generateToken(userEntity);
     }
 
 }

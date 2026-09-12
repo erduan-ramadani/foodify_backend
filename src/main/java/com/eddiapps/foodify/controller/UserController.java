@@ -1,6 +1,5 @@
 package com.eddiapps.foodify.controller;
 
-import com.eddiapps.foodify.dto.CreateUserRequest;
 import com.eddiapps.foodify.dto.UpdateUserRequest;
 import com.eddiapps.foodify.dto.UserResponse;
 import com.eddiapps.foodify.service.UserService;
@@ -19,11 +18,6 @@ public class UserController {
 
     UserController(UserService userService) {
         this.userService = userService;
-    }
-
-    @PostMapping
-    public UserResponse createUser(@Valid @RequestBody CreateUserRequest user) {
-        return userService.createUser(user);
     }
 
     @GetMapping("/{id}")
