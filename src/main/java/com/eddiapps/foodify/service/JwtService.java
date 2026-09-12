@@ -23,24 +23,24 @@ public class JwtService {
 
     public String generateToken(UserEntity user) {
         Date date = Date.from(Instant.now().plus(15, ChronoUnit.MINUTES));
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
-        SecretKey secretKey = Keys.hmacShaKeyFor(keyBytes);
         return Jwts.builder()
                 .subject(user.getEmail())
                 .expiration(date)
-                .signWith(secretKey)
+                .signWith(getSigningKey())
                 .compact();
     }
 
     public String extractEmail(String jwt) {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
-        SecretKey secretKey = Keys.hmacShaKeyFor(keyBytes);
-
         return Jwts.parser()
-                .verifyWith(secretKey)
+                .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(jwt)
                 .getPayload()
                 .getSubject();
+    }
+
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }
