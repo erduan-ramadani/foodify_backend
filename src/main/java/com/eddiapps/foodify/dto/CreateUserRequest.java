@@ -2,6 +2,7 @@ package com.eddiapps.foodify.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public class CreateUserRequest {
     @Email
@@ -9,6 +10,17 @@ public class CreateUserRequest {
     private String email;
     @NotBlank
     private String name;
+    @NotBlank
+    @Size(min = 8)
+    private String password;
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public String getEmail() {
         return email;

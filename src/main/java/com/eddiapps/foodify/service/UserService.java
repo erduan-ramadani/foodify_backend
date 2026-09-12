@@ -8,6 +8,7 @@ import com.eddiapps.foodify.exception.EmailAlreadyExistsException;
 import com.eddiapps.foodify.exception.UserNotFoundException;
 import com.eddiapps.foodify.repository.UserRepository;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,9 +18,11 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserResponse createUser(CreateUserRequest request) {
@@ -31,6 +34,8 @@ public class UserService {
         UserEntity user = new UserEntity();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
+        String passwordHash = passwordEncoder.encode(request.getPassword());
+        user.setPasswordHash(passwordHash);
 
         UserEntity savedUser = userRepository.save(user);
         return new UserResponse(

@@ -14,6 +14,9 @@ public class UserEntity {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(nullable = false)
+    private String passwordHash;
+
     private String name;
     @OneToMany(mappedBy = "user")
     private List<FoodEntryEntity> foodEntries;
@@ -40,5 +43,13 @@ public class UserEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 }
