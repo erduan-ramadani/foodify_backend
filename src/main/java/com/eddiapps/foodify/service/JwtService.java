@@ -20,9 +20,11 @@ public class JwtService {
 
     @Value("${jwt.secret}")
     private String secret;
+    @Value("${jwt.expiration-minutes}")
+    private long expirationMinutes;
 
     public String generateToken(UserEntity user) {
-        Date date = Date.from(Instant.now().plus(15, ChronoUnit.MINUTES));
+        Date date = Date.from(Instant.now().plus(expirationMinutes, ChronoUnit.MINUTES));
         return Jwts.builder()
                 .subject(user.getEmail())
                 .expiration(date)
