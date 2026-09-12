@@ -3,8 +3,10 @@ package com.eddiapps.foodify.controller;
 import com.eddiapps.foodify.dto.CreateFoodEntryRequest;
 import com.eddiapps.foodify.dto.FoodEntryResponse;
 import com.eddiapps.foodify.dto.UpdateFoodEntryRequest;
+import com.eddiapps.foodify.entity.UserEntity;
 import com.eddiapps.foodify.service.FoodEntryService;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,7 +14,7 @@ import java.util.List;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/users/{userId}/food-entries")
+@RequestMapping("/api/food-entries")
 public class FoodEntryController {
 
     private final FoodEntryService foodEntryService;
@@ -23,28 +25,32 @@ public class FoodEntryController {
 
     @PostMapping
     public FoodEntryResponse createFoodEntry(
-            @PathVariable Long userId,
+            Authentication authentication,
             @Valid @RequestBody CreateFoodEntryRequest request) {
-        return foodEntryService.createFoodEntry(userId, request);
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        return foodEntryService.createFoodEntry(user.getId(), request);
     }
 
     @GetMapping
-    public List<FoodEntryResponse> getFoodEntries(@PathVariable Long userId) {
-        return foodEntryService.getFoodEntriesByUserId(userId);
+    public List<FoodEntryResponse> getFoodEntries(Authentication authentication) {
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        return foodEntryService.getFoodEntriesByUserId(user.getId());
     }
 
     @PutMapping("/{foodEntryId}")
     public FoodEntryResponse updateFoodEntry(
-            @PathVariable Long userId,
+            Authentication authentication,
             @PathVariable Long foodEntryId,
             @Valid @RequestBody UpdateFoodEntryRequest request) {
-        return foodEntryService.updateFoodEntry(userId, foodEntryId, request);
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        return foodEntryService.updateFoodEntry(user.getId(), foodEntryId, request);
     }
 
     @DeleteMapping("/{foodEntryId}")
     public void deleteFoodEntry(
-            @PathVariable Long userId,
+            Authentication authentication,
             @PathVariable Long foodEntryId) {
-        foodEntryService.deleteFoodEntry(userId, foodEntryId);
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        foodEntryService.deleteFoodEntry(user.getId(), foodEntryId);
     }
 }
