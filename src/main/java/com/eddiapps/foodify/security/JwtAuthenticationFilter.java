@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Optional;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,22 +36,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
+
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
-        String jwt = authorizationHeader.substring(7);
-        String extractedEmail = jwtService.extractEmail(jwt);
-        Optional<UserEntity> user = userRepository.findByEmail(extractedEmail);
 
-        if (user.isPresent()) {
+        try {
+            String jwt = authorizationHeader.substring(7);
+            String extractedEmail = jwtService.extractEmail(jwt);
+            Optional<UserEntity> user = userRepository.findByEmail(extractedEmail);
+
+            if (user.isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+            
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(
                             user.get(), null, Collections.emptyList()
                     );
             SecurityContextHolder.getContext().setAuthentication(authToken);
+        } catch (JwtException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
         }
+
 
         filterChain.doFilter(request, response);
     }
