@@ -13,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @Configuration
 public class SecurityConfig {
 
@@ -30,12 +32,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain createSecurityFilterChain(HttpSecurity httpSecurity) {
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
-        
+
         httpSecurity.sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );
+
         httpSecurity.addFilterBefore(
                 jwtAuthFilter, UsernamePasswordAuthenticationFilter.class
+        );
+
+        httpSecurity.exceptionHandling(exceptions ->
+                exceptions.authenticationEntryPoint(
+                        (request, response, authException) ->
+                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
+                )
         );
 
         return httpSecurity.authorizeHttpRequests(auth ->
