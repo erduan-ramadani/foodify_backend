@@ -2,6 +2,7 @@ package com.eddiapps.foodify.security;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.eddiapps.foodify.entity.UserEntity;
@@ -85,5 +86,23 @@ public class SecurityIntegrationTest {
         mockMvc.perform(get("/api/food-entries")
                         .header("Authorization", "Bearer " + expiredJwt))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void invalidLoginRequestReturnsStructuredValidationError() throws Exception {
+        String json = """
+                {
+                  "email": "keine-email",
+                  "password": ""
+                }
+                """;
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 }
