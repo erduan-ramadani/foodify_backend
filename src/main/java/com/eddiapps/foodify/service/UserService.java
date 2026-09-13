@@ -7,6 +7,8 @@ import com.eddiapps.foodify.exception.InvalidCredentialsException;
 import com.eddiapps.foodify.exception.UserNotFoundException;
 import com.eddiapps.foodify.repository.UserRepository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,8 @@ import java.util.Optional;
 
 @Service
 public class UserService {
+
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -99,13 +103,17 @@ public class UserService {
     public LoginResponse login(LoginRequest request) {
         Optional<UserEntity> user = userRepository.findByEmail(request.getEmail());
         if (user.isEmpty()) {
+            log.warn("User login not successful");
             throw new InvalidCredentialsException("Invalid credentials");
         }
 
         UserEntity userEntity = user.get();
         if (!passwordEncoder.matches(request.getPassword(), userEntity.getPasswordHash())) {
+            log.warn("User login not successful");
             throw new InvalidCredentialsException("Invalid credentials");
         }
+
+        log.info("User logged in: {}", userEntity.getEmail());
 
         return new LoginResponse(
                 jwtService.generateToken(userEntity), "Bearer"

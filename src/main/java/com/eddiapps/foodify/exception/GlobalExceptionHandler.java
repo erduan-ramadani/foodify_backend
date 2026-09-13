@@ -2,6 +2,8 @@ package com.eddiapps.foodify.exception;
 
 import com.eddiapps.foodify.dto.ApiErrorResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -14,6 +16,18 @@ import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(Exception.class)
+    ResponseEntity<ApiErrorResponse> handleUnexpectedException(Exception ex) {
+        ApiErrorResponse response = new ApiErrorResponse(500, "Internal server error", Instant.now());
+        log.error("Unexpected server error", ex);
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(response);
+    }
+
     @ExceptionHandler(EmailAlreadyExistsException.class)
     ResponseEntity<ApiErrorResponse> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex) {
         ApiErrorResponse response = new ApiErrorResponse(409, ex.getMessage(), Instant.now());
