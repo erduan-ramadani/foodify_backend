@@ -95,9 +95,11 @@ public class UserService {
         UserEntity userEntity = user.get();
         userEntity.setName(request.getName());
         userEntity.setEmail(request.getEmail());
-
-        UserEntity savedUser = userRepository.save(userEntity);
-        return new UserResponse(savedUser.getId(), savedUser.getEmail(), savedUser.getName());
+        return new UserResponse(
+                userEntity.getId(),
+                userEntity.getEmail(),
+                userEntity.getName()
+        );
     }
 
     @Transactional
