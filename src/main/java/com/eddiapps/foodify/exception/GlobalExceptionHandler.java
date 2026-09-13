@@ -4,10 +4,13 @@ import com.eddiapps.foodify.dto.ApiErrorResponse;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Instant;
+import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -40,6 +43,32 @@ public class GlobalExceptionHandler {
         ApiErrorResponse response = new ApiErrorResponse(401, ex.getMessage(), Instant.now());
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
+                .body(response);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    ResponseEntity<ApiErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
+        List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
+        String message = "";
+        boolean first = true;
+
+        for (FieldError fieldError : fieldErrors) {
+            if (!first) {
+                message += ", ";
+            }
+
+            message += fieldError.getField() + ": " + fieldError.getDefaultMessage();
+            first = false;
+        }
+
+        ApiErrorResponse response = new ApiErrorResponse(
+                400,
+                message,
+                Instant.now()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .body(response);
     }
 }
