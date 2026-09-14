@@ -6,10 +6,10 @@ import com.eddiapps.foodify.dto.UpdateFoodEntryRequest;
 import com.eddiapps.foodify.entity.UserEntity;
 import com.eddiapps.foodify.service.FoodEntryService;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 import jakarta.validation.Valid;
 
@@ -32,9 +32,9 @@ public class FoodEntryController {
     }
 
     @GetMapping
-    public List<FoodEntryResponse> getFoodEntries(Authentication authentication) {
+    public Page<FoodEntryResponse> getFoodEntries(Authentication authentication, Pageable pageable) {
         UserEntity user = (UserEntity) authentication.getPrincipal();
-        return foodEntryService.getFoodEntriesByUserId(user.getId());
+        return foodEntryService.getFoodEntriesByUserId(user.getId(), pageable);
     }
 
     @PutMapping("/{foodEntryId}")

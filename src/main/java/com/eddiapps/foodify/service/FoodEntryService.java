@@ -10,9 +10,10 @@ import com.eddiapps.foodify.exception.UserNotFoundException;
 import com.eddiapps.foodify.repository.FoodEntryRepository;
 import com.eddiapps.foodify.repository.UserRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -44,10 +45,10 @@ public class FoodEntryService {
         return toFoodEntryResponse(savedFoodEntry);
     }
 
-    public List<FoodEntryResponse> getFoodEntriesByUserId(Long userId) {
+    public Page<FoodEntryResponse> getFoodEntriesByUserId(Long userId, Pageable pageable) {
         getUserOrThrow(userId);
-        List<FoodEntryEntity> foodEntries = foodEntryRepository.findByUser_Id(userId);
-        return foodEntries.stream().map(this::toFoodEntryResponse).toList();
+        Page<FoodEntryEntity> foodEntries = foodEntryRepository.findByUser_Id(userId, pageable);
+        return foodEntries.map(this::toFoodEntryResponse);
     }
 
     public FoodEntryResponse updateFoodEntry(
