@@ -8,6 +8,8 @@ import com.eddiapps.foodify.service.FoodEntryService;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +34,15 @@ public class FoodEntryController {
     }
 
     @GetMapping
-    public Page<FoodEntryResponse> getFoodEntries(Authentication authentication, Pageable pageable) {
+    public Page<FoodEntryResponse> getFoodEntries(
+            Authentication authentication,
+            @PageableDefault(
+                    size = 20,
+                    sort = "id",
+                    direction = Sort.Direction.DESC
+            )
+            Pageable pageable
+    ) {
         UserEntity user = (UserEntity) authentication.getPrincipal();
         return foodEntryService.getFoodEntriesByUserId(user.getId(), pageable);
     }
