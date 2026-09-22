@@ -212,6 +212,9 @@ public class UserServiceTest {
 
         assertEquals("test-token", loginResponse.getToken());
         assertEquals("Bearer", loginResponse.getTokenType());
+
+        verify(passwordEncoder).matches(loginRequest.getPassword(), user.getPasswordHash());
+        verify(jwtService).generateToken(user);
     }
 
     @Test
@@ -220,11 +223,15 @@ public class UserServiceTest {
         loginRequest.setEmail("eddo@web.de");
         loginRequest.setPassword("Secret123");
 
-        when(userRepository.findByEmail(loginRequest.getEmail())).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(loginRequest.getEmail()))
+                .thenReturn(Optional.empty());
 
         assertThrows(InvalidCredentialsException.class,
                 () -> userService.login(loginRequest)
         );
+
+        verify(passwordEncoder, never()).matches(any(), any());
+        verify(jwtService, never()).generateToken(any(UserEntity.class));
     }
 
     @Test
@@ -244,5 +251,8 @@ public class UserServiceTest {
         assertThrows(InvalidCredentialsException.class,
                 () -> userService.login(loginRequest)
         );
+
+        verify(passwordEncoder).matches(loginRequest.getPassword(), user.getPasswordHash());
+        verify(jwtService, never()).generateToken(any(UserEntity.class));
     }
 }
