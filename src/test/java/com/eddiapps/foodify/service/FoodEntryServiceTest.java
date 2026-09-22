@@ -20,6 +20,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -107,27 +111,32 @@ public class FoodEntryServiceTest {
         FoodEntryEntity foodEntry2 = new FoodEntryEntity();
         foodEntry2.setName("Döner");
 
+        Pageable pageable = PageRequest.of(0, 10);
+
         when(userRepository.findById(1L)).thenReturn(Optional.of(userEntity));
-        when(foodEntryRepository.findByUser_Id(1L)).thenReturn(List.of(foodEntry1, foodEntry2));
+        when(foodEntryRepository.findByUser_Id(1L, pageable))
+                .thenReturn(new PageImpl<>(List.of(foodEntry1, foodEntry2)));
 
-        List<FoodEntryResponse> response = foodEntryService.getFoodEntriesByUserId(1L);
+        Page<FoodEntryResponse> response = foodEntryService.getFoodEntriesByUserId(1L, pageable);
 
-        assertEquals(2, response.size());
-        assertEquals("Chicken", response.getFirst().getName());
+        assertEquals(2, response.getTotalElements());
+        assertEquals("Chicken", response.getContent().getFirst().getName());
 
-        verify(foodEntryRepository).findByUser_Id(1L);
+        verify(foodEntryRepository).findByUser_Id(1L, pageable);
     }
 
     @Test
     void getFoodEntriesByUserId_userNotFound() {
+        Pageable pageable = PageRequest.of(0, 10);
+
         when(userRepository.findById(99L))
                 .thenReturn(Optional.empty());
 
         assertThrows(UserNotFoundException.class,
-                () -> foodEntryService.getFoodEntriesByUserId(99L)
+                () -> foodEntryService.getFoodEntriesByUserId(99L, pageable)
         );
 
-        verify(foodEntryRepository, never()).findByUser_Id(99L);
+        verify(foodEntryRepository, never()).findByUser_Id(99L, pageable);
     }
 
     @Test
