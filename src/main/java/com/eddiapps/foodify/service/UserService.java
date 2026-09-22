@@ -10,11 +10,12 @@ import com.eddiapps.foodify.repository.UserRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -75,15 +76,13 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserResponse> getAllUsers() {
-        List<UserEntity> users = userRepository.findAll();
-        return users
-                .stream()
-                .map(user -> new UserResponse(
-                        user.getId(),
-                        user.getEmail(),
-                        user.getName()))
-                .toList();
+    public Page<UserResponse> getAllUsers(Pageable pageable) {
+        Page<UserEntity> users = userRepository.findAll(pageable);
+        return users.map(user -> new UserResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getName())
+        );
     }
 
     @Transactional

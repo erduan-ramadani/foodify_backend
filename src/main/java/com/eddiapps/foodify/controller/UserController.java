@@ -4,9 +4,9 @@ import com.eddiapps.foodify.dto.UpdateUserRequest;
 import com.eddiapps.foodify.dto.UserResponse;
 import com.eddiapps.foodify.service.UserService;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 import jakarta.validation.Valid;
 
@@ -26,8 +26,8 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserResponse> getAllUsers() {
-        return userService.getAllUsers();
+    public Page<UserResponse> getAllUsers(Pageable pageable) {
+        return userService.getAllUsers(pageable);
     }
 
     @PutMapping("/{id}")
