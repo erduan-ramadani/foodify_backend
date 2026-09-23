@@ -13,6 +13,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 import jakarta.validation.Valid;
 
 @RestController
@@ -30,6 +32,7 @@ public class FoodEntryController {
             Authentication authentication,
             @Valid @RequestBody CreateFoodEntryRequest request) {
         UserEntity user = (UserEntity) authentication.getPrincipal();
+        assert user != null;
         return foodEntryService.createFoodEntry(user.getId(), request);
     }
 
@@ -45,6 +48,21 @@ public class FoodEntryController {
     ) {
         UserEntity user = (UserEntity) authentication.getPrincipal();
         return foodEntryService.getFoodEntriesByUserId(user.getId(), pageable);
+    }
+
+    @GetMapping("/date")
+    public Page<FoodEntryResponse> getFoodEntriesByDate(
+            Authentication authentication,
+            @RequestParam LocalDate date,
+            @PageableDefault(
+                    size = 20,
+                    sort = "id",
+                    direction = Sort.Direction.DESC
+            )
+            Pageable pageable
+    ) {
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        return foodEntryService.getFoodEntriesByDate(user.getId(), date, pageable);
     }
 
     @PutMapping("/{foodEntryId}")

@@ -1,5 +1,7 @@
 package com.eddiapps.foodify.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -13,6 +15,7 @@ public class FoodEntryEntity {
     private Double protein;
     private Double carbs;
     private Double fat;
+    private LocalDateTime createdAt;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
@@ -71,5 +74,13 @@ public class FoodEntryEntity {
 
     public void setUser(UserEntity user) {
         this.user = user;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

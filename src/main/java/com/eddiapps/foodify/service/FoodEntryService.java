@@ -14,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -40,6 +42,7 @@ public class FoodEntryService {
         foodEntryEntity.setCarbs(request.getCarbs());
         foodEntryEntity.setFat(request.getFat());
         foodEntryEntity.setUser(userEntity);
+        foodEntryEntity.setCreatedAt(LocalDateTime.now());
 
         FoodEntryEntity savedFoodEntry = foodEntryRepository.save(foodEntryEntity);
         return toFoodEntryResponse(savedFoodEntry);
@@ -48,6 +51,18 @@ public class FoodEntryService {
     public Page<FoodEntryResponse> getFoodEntriesByUserId(Long userId, Pageable pageable) {
         getUserOrThrow(userId);
         Page<FoodEntryEntity> foodEntries = foodEntryRepository.findByUser_Id(userId, pageable);
+        return foodEntries.map(this::toFoodEntryResponse);
+    }
+
+    public Page<FoodEntryResponse> getFoodEntriesByDate(Long userId, LocalDate date, Pageable pageable) {
+        getUserOrThrow(userId);
+        Page<FoodEntryEntity> foodEntries =
+                foodEntryRepository.findByUser_IdAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(
+                        userId,
+                        date.atStartOfDay(),
+                        date.atStartOfDay().plusDays(1),
+                        pageable
+                );
         return foodEntries.map(this::toFoodEntryResponse);
     }
 
