@@ -277,7 +277,7 @@ H2 is used as the test database.
 
 ## Key Learnings
 
-This project is part of my transition from client-side development toward Java backend development.
+This project expands my software engineering expertise into Java backend development, complementing my professional experience in Android development since 2011.
 
 ### Spring Boot Architecture
 
