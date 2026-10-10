@@ -1,8 +1,11 @@
 # Foodify Backend
 
-Backend service for **Foodify**, built with Java and Spring Boot.
+Foodify Backend is an independent Java and Spring Boot project inspired by my published Android application, Foodify.
 
-Foodify is a nutrition tracking application. This backend provides authentication, user management and food entry management through a secured REST API.
+It implements a secure REST API for authentication, user management, and nutrition tracking using Java 21, Spring Boot 4, and PostgreSQL.
+
+The project is developed separately from the published Foodify Android app and is not currently used as its production backend.
+
 
 ## Tech Stack
 
